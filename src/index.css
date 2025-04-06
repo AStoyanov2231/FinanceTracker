@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Base styles */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #f3f4f6;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Improved focus styles */
+*:focus {
+  outline: 2px solid rgba(79, 70, 229, 0.5);
+  outline-offset: 2px;
+}
+
+/* Custom scroll bar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Metallic Card Effect */
+.bg-gray-800 {
+  background-image: linear-gradient(145deg, #1e293b, #111827);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+.bg-gray-700\/50 {
+  background-image: linear-gradient(145deg, rgba(55, 65, 81, 0.7), rgba(31, 41, 55, 0.7));
+  backdrop-filter: blur(4px);
+}
+
+/* Metallic Button Effect */
+.bg-indigo-600 {
+  background-image: linear-gradient(145deg, #4f46e5, #4338ca);
+}
+
+.bg-indigo-700 {
+  background-image: linear-gradient(145deg, #4338ca, #3730a3);
+}
+
+/* Shine effect on cards */
+.rounded-xl {
+  position: relative;
+  overflow: hidden;
+}
+
+.rounded-xl::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  pointer-events: none;
+}

@@ -1,0 +1,22 @@
+{
+  "appId": "com.financetracker.app",
+  "productName": "Finance Tracker",
+  "directories": {
+    "output": "dist_electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.finance",
+    "target": ["dmg", "zip"]
+  },
+  "win": {
+    "target": ["nsis", "portable"]
+  },
+  "linux": {
+    "target": ["AppImage", "deb"],
+    "category": "Finance"
+  }
+} 
