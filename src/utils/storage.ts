@@ -1,35 +1,19 @@
 import { FinanceData, Expense, SavingGoal } from './types';
 
-// Define the type for the Electron API
-declare global {
-  interface Window {
-    electronAPI?: {
-      getData: () => Promise<FinanceData>;
-      saveData: (data: FinanceData) => Promise<boolean>;
-    };
-  }
-}
+// Local storage key
+const STORAGE_KEY = 'finance-tracker-data';
 
-// Default data if electronAPI is not available (web only mode)
+// Default data
 const defaultData: FinanceData = {
   expenses: [],
   savingGoals: []
 };
 
-// Local storage key
-const STORAGE_KEY = 'finance-tracker-data';
-
-// Utility for data operations
+// Utility for data operations with localStorage
 export const storage = {
   // Get all data
   async getData(): Promise<FinanceData> {
     try {
-      // Try to use Electron API first
-      if (window.electronAPI) {
-        return await window.electronAPI.getData();
-      }
-      
-      // Fallback to localStorage for web
       const dataStr = localStorage.getItem(STORAGE_KEY);
       if (dataStr) {
         return JSON.parse(dataStr) as FinanceData;
@@ -47,12 +31,6 @@ export const storage = {
   // Save all data
   async saveData(data: FinanceData): Promise<boolean> {
     try {
-      // Try to use Electron API first
-      if (window.electronAPI) {
-        return await window.electronAPI.saveData(data);
-      }
-      
-      // Fallback to localStorage for web
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       return true;
     } catch (error) {
@@ -109,5 +87,37 @@ export const storage = {
     const data = await this.getData();
     data.savingGoals = data.savingGoals.filter(g => g.id !== id);
     return this.saveData(data);
+  },
+  
+  // Export data as JSON file
+  exportData(): void {
+    this.getData().then(data => {
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+      
+      const exportFileDefaultName = `finance-tracker-export-${new Date().toISOString().slice(0, 10)}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    });
+  },
+  
+  // Import data from JSON file
+  async importData(jsonData: string): Promise<boolean> {
+    try {
+      const data = JSON.parse(jsonData) as FinanceData;
+      
+      // Validate the data structure
+      if (!data.expenses || !data.savingGoals) {
+        throw new Error('Invalid data format');
+      }
+      
+      return this.saveData(data);
+    } catch (error) {
+      console.error('Error importing data:', error);
+      return false;
+    }
   }
 }; 
