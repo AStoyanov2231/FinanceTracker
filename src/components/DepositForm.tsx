@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { SavingGoal } from '../utils/types';
 
-interface ContributionFormProps {
-  goal: SavingGoal;
-  onSubmit: (goalId: string, amount: number) => Promise<void>;
+interface DepositFormProps {
+  onSubmit: (amount: number) => Promise<void>;
   onCancel: () => void;
+  currentBudget: number;
 }
 
-const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onCancel }) => {
+const DepositForm: React.FC<DepositFormProps> = ({ onSubmit, onCancel, currentBudget }) => {
   const [amount, setAmount] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -20,7 +19,7 @@ const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onC
     
     setIsSubmitting(true);
     try {
-      await onSubmit(goal.id, parseFloat(amount));
+      await onSubmit(parseFloat(amount));
     } finally {
       setIsSubmitting(false);
     }
@@ -43,27 +42,21 @@ const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onC
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-gray-100">
-          Contribute to {goal.name}
+          Deposit Money
         </h2>
       </div>
       
       <div className="bg-gray-700/50 p-4 rounded-lg mb-6 border border-gray-600">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current balance</p>
-            <p className="text-lg font-medium text-gray-100">{formatCurrency(goal.currentAmount)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Target</p>
-            <p className="text-lg font-medium text-gray-100">{formatCurrency(goal.targetAmount)}</p>
-          </div>
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Budget</p>
+          <p className="text-lg font-medium text-gray-100">{formatCurrency(currentBudget)}</p>
         </div>
       </div>
       
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <label htmlFor="amount" className="block text-sm font-medium text-gray-300 mb-2">
-            Contribution Amount
+            Deposit Amount
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -84,9 +77,12 @@ const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onC
           </div>
           {amount && parseFloat(amount) > 0 && (
             <p className="mt-2 text-sm text-green-400">
-              New balance will be: {formatCurrency(goal.currentAmount + parseFloat(amount))}
+              New budget will be: {formatCurrency(currentBudget + parseFloat(amount))}
             </p>
           )}
+          <p className="mt-4 text-sm text-gray-400">
+            This amount will be added to your budget and automatically distributed to your saving goals based on their remaining amounts.
+          </p>
         </div>
         
         <div className="flex space-x-3 justify-end">
@@ -110,7 +106,7 @@ const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onC
                 </svg>
                 Processing...
               </div>
-            ) : 'Contribute'}
+            ) : 'Deposit'}
           </button>
         </div>
       </form>
@@ -118,4 +114,4 @@ const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit, onC
   );
 };
 
-export default ContributionForm; 
+export default DepositForm; 

@@ -6,6 +6,7 @@ import { storage } from '../utils/storage';
 interface FinanceContextType {
   expenses: Expense[];
   savingGoals: SavingGoal[];
+  budget: number;
   isLoading: boolean;
   addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
   updateExpense: (expense: Expense) => Promise<void>;
@@ -13,7 +14,8 @@ interface FinanceContextType {
   addSavingGoal: (goal: Omit<SavingGoal, 'id'>) => Promise<void>;
   updateSavingGoal: (goal: SavingGoal) => Promise<void>;
   deleteSavingGoal: (id: string) => Promise<void>;
-  contributeToSavingGoal: (goalId: string, amount: number) => Promise<void>;
+  addToBudget: (amount: number) => Promise<void>;
+  getAvailableBalance: () => number;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -31,7 +33,11 @@ interface FinanceProviderProps {
 }
 
 export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) => {
-  const [financeData, setFinanceData] = useState<FinanceData>({ expenses: [], savingGoals: [] });
+  const [financeData, setFinanceData] = useState<FinanceData>({ 
+    expenses: [], 
+    savingGoals: [],
+    budget: 0
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Load data on initial mount
@@ -50,7 +56,12 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     loadData();
   }, []);
 
-  // Add a new expense
+  // Get the total available balance (budget)
+  const getAvailableBalance = (): number => {
+    return financeData.budget;
+  };
+
+  // Add a new expense (deducts from budget)
   const addExpense = async (expense: Omit<Expense, 'id'>) => {
     const newExpense: Expense = {
       ...expense,
@@ -58,40 +69,89 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     };
     
     await storage.addExpense(newExpense);
+    
+    // Update budget
+    const updatedBudget = Math.max(0, financeData.budget - newExpense.amount);
+    await storage.updateBudget(updatedBudget);
+    
     setFinanceData(prev => ({
       ...prev,
-      expenses: [...prev.expenses, newExpense]
+      expenses: [...prev.expenses, newExpense],
+      budget: updatedBudget
     }));
   };
 
   // Update an existing expense
   const updateExpense = async (updatedExpense: Expense) => {
+    const oldExpense = financeData.expenses.find(e => e.id === updatedExpense.id);
+    
     await storage.updateExpense(updatedExpense);
-    setFinanceData(prev => ({
-      ...prev,
-      expenses: prev.expenses.map(exp => 
-        exp.id === updatedExpense.id ? updatedExpense : exp
-      )
-    }));
+    
+    if (oldExpense) {
+      const difference = oldExpense.amount - updatedExpense.amount;
+      
+      if (difference !== 0) {
+        let updatedBudget = financeData.budget;
+        
+        if (difference > 0) {
+          // Expense reduced, add difference back
+          updatedBudget = financeData.budget + difference;
+          await storage.updateBudget(updatedBudget);
+        } else {
+          // Expense increased, deduct difference
+          const increaseAmount = Math.abs(difference);
+          updatedBudget = Math.max(0, financeData.budget - increaseAmount);
+          await storage.updateBudget(updatedBudget);
+        }
+        
+        setFinanceData(prev => ({
+          ...prev,
+          expenses: prev.expenses.map(exp => 
+            exp.id === updatedExpense.id ? updatedExpense : exp
+          ),
+          budget: updatedBudget
+        }));
+      } else {
+        // Amount unchanged, just update the expense
+        setFinanceData(prev => ({
+          ...prev,
+          expenses: prev.expenses.map(exp => 
+            exp.id === updatedExpense.id ? updatedExpense : exp
+          )
+        }));
+      }
+    }
   };
 
-  // Delete an expense
+  // Delete an expense (adds amount back to budget)
   const deleteExpense = async (id: string) => {
+    const expense = financeData.expenses.find(e => e.id === id);
+    
     await storage.deleteExpense(id);
-    setFinanceData(prev => ({
-      ...prev,
-      expenses: prev.expenses.filter(exp => exp.id !== id)
-    }));
+    
+    if (expense) {
+      // Add expense amount back to budget
+      const updatedBudget = financeData.budget + expense.amount;
+      await storage.updateBudget(updatedBudget);
+      
+      setFinanceData(prev => ({
+        ...prev,
+        expenses: prev.expenses.filter(exp => exp.id !== id),
+        budget: updatedBudget
+      }));
+    }
   };
 
   // Add a new saving goal
   const addSavingGoal = async (goal: Omit<SavingGoal, 'id'>) => {
     const newGoal: SavingGoal = {
       ...goal,
-      id: uuidv4()
+      id: uuidv4(),
+      currentAmount: 0 // Always start at 0
     };
     
     await storage.addSavingGoal(newGoal);
+    
     setFinanceData(prev => ({
       ...prev,
       savingGoals: [...prev.savingGoals, newGoal]
@@ -112,34 +172,28 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
   // Delete a saving goal
   const deleteSavingGoal = async (id: string) => {
     await storage.deleteSavingGoal(id);
+    
     setFinanceData(prev => ({
       ...prev,
       savingGoals: prev.savingGoals.filter(goal => goal.id !== id)
     }));
   };
 
-  // Contribute to a saving goal
-  const contributeToSavingGoal = async (goalId: string, amount: number) => {
-    const goal = financeData.savingGoals.find(g => g.id === goalId);
-    if (!goal) return;
-
-    const updatedGoal: SavingGoal = {
-      ...goal,
-      currentAmount: goal.currentAmount + amount
-    };
+  // Add to budget
+  const addToBudget = async (amount: number) => {
+    const updatedBudget = financeData.budget + amount;
+    await storage.updateBudget(updatedBudget);
     
-    await storage.updateSavingGoal(updatedGoal);
     setFinanceData(prev => ({
       ...prev,
-      savingGoals: prev.savingGoals.map(g => 
-        g.id === goalId ? updatedGoal : g
-      )
+      budget: updatedBudget
     }));
   };
 
   const value = {
     expenses: financeData.expenses,
     savingGoals: financeData.savingGoals,
+    budget: financeData.budget,
     isLoading,
     addExpense,
     updateExpense,
@@ -147,7 +201,8 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     addSavingGoal,
     updateSavingGoal,
     deleteSavingGoal,
-    contributeToSavingGoal
+    addToBudget,
+    getAvailableBalance
   };
 
   return (

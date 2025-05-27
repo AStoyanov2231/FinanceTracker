@@ -6,7 +6,8 @@ const STORAGE_KEY = 'finance-tracker-data';
 // Default data
 const defaultData: FinanceData = {
   expenses: [],
-  savingGoals: []
+  savingGoals: [],
+  budget: 0
 };
 
 // Utility for data operations with localStorage
@@ -89,6 +90,20 @@ export const storage = {
     return this.saveData(data);
   },
   
+  // Update budget
+  async updateBudget(amount: number): Promise<boolean> {
+    const data = await this.getData();
+    data.budget = amount;
+    return this.saveData(data);
+  },
+
+  // Add to budget
+  async addToBudget(amount: number): Promise<boolean> {
+    const data = await this.getData();
+    data.budget += amount;
+    return this.saveData(data);
+  },
+  
   // Export data as JSON file
   exportData(): void {
     this.getData().then(data => {
@@ -112,6 +127,11 @@ export const storage = {
       // Validate the data structure
       if (!data.expenses || !data.savingGoals) {
         throw new Error('Invalid data format');
+      }
+      
+      // Ensure budget exists
+      if (data.budget === undefined) {
+        data.budget = 0;
       }
       
       return this.saveData(data);

@@ -2,32 +2,29 @@ import React, { useState } from 'react';
 import { useFinance } from '../contexts/FinanceContext';
 import SavingGoalForm from '../components/SavingGoalForm';
 import SavingGoalList from '../components/SavingGoalList';
-import ContributionForm from '../components/ContributionForm';
 import { SavingGoal } from '../utils/types';
 
 const SavingGoalsPage: React.FC = () => {
-  const { savingGoals, isLoading, addSavingGoal, updateSavingGoal, deleteSavingGoal, contributeToSavingGoal } = useFinance();
+  const { 
+    savingGoals, 
+    budget, 
+    isLoading, 
+    addSavingGoal, 
+    updateSavingGoal, 
+    deleteSavingGoal,
+    getAvailableBalance
+  } = useFinance();
   const [showForm, setShowForm] = useState(false);
-  const [showContributionForm, setShowContributionForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingGoal | undefined>(undefined);
-  const [contributingGoal, setContributingGoal] = useState<SavingGoal | undefined>(undefined);
 
   const handleAddClick = () => {
     setEditingGoal(undefined);
     setShowForm(true);
-    setShowContributionForm(false);
   };
 
   const handleEditClick = (goal: SavingGoal) => {
     setEditingGoal(goal);
     setShowForm(true);
-    setShowContributionForm(false);
-  };
-
-  const handleContributeClick = (goal: SavingGoal) => {
-    setContributingGoal(goal);
-    setShowContributionForm(true);
-    setShowForm(false);
   };
 
   const handleSubmit = async (goalData: Omit<SavingGoal, 'id'> | SavingGoal) => {
@@ -40,38 +37,30 @@ const SavingGoalsPage: React.FC = () => {
     setEditingGoal(undefined);
   };
 
-  const handleContribution = async (goalId: string, amount: number) => {
-    await contributeToSavingGoal(goalId, amount);
-    setShowContributionForm(false);
-    setContributingGoal(undefined);
-  };
-
   const handleCancel = () => {
     setShowForm(false);
-    setShowContributionForm(false);
     setEditingGoal(undefined);
-    setContributingGoal(undefined);
   };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-pulse flex space-x-2">
-          <div className="h-3 w-3 bg-indigo-400 rounded-full"></div>
-          <div className="h-3 w-3 bg-indigo-400 rounded-full"></div>
-          <div className="h-3 w-3 bg-indigo-400 rounded-full"></div>
+        <div className="flex space-x-2">
+          <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-bounce"></div>
+          <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+          <div className="w-4 h-4 bg-gradient-to-r from-pink-500 to-red-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
         </div>
       </div>
     );
   }
 
-  // Calculate total progress
+  // Get available balance
+  const availableBalance = getAvailableBalance();
+  
+  // Calculate basic metrics
   const totalTarget = savingGoals.reduce((sum, goal) => sum + goal.targetAmount, 0);
   const totalCurrent = savingGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
-  const totalProgressPercent = totalTarget > 0 
-    ? Math.round((totalCurrent / totalTarget) * 100) 
-    : 0;
-
+  
   // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -80,79 +69,104 @@ const SavingGoalsPage: React.FC = () => {
     }).format(amount);
   };
 
+  // Calculate progress percentage with available balance
+  const calculateOverallProgress = () => {
+    if (totalTarget === 0) return 0;
+    
+    const withAvailable = Math.min(totalTarget, totalCurrent + availableBalance);
+    return Math.round((withAvailable / totalTarget) * 100);
+  };
+
+  const overallProgress = calculateOverallProgress();
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-100">Saving Goals</h1>
-        {!showForm && !showContributionForm && (
-          <button
-            onClick={handleAddClick}
-            className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 flex items-center border border-indigo-500"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add Saving Goal
-          </button>
-        )}
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Saving Goals</h1>
+        <button
+          onClick={handleAddClick}
+          className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+          </svg>
+          New Goal
+        </button>
       </div>
 
-      {/* Summary Card */}
+      {/* Stats Overview */}
       {savingGoals.length > 0 && (
-        <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
-          <h2 className="text-lg font-medium text-gray-100 mb-4">Overall Progress</h2>
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Savings Overview</h2>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-800">
-              <p className="text-sm font-medium text-indigo-300 mb-1">Target</p>
-              <p className="text-2xl font-semibold text-gray-100">{formatCurrency(totalTarget)}</p>
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+              <p className="text-sm font-medium text-gray-300 mb-1">Target Amount</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(totalTarget)}</p>
+              <p className="text-xs text-gray-400 mt-1">Total goal amount</p>
             </div>
-            <div className="bg-green-900/40 p-4 rounded-lg border border-green-800">
-              <p className="text-sm font-medium text-green-300 mb-1">Current</p>
-              <p className="text-2xl font-semibold text-gray-100">{formatCurrency(totalCurrent)}</p>
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+              <p className="text-sm font-medium text-gray-300 mb-1">Available Funds</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(totalCurrent + availableBalance)}</p>
+              {availableBalance > 0 && (
+                <p className="text-xs text-emerald-400 mt-1">
+                  {formatCurrency(totalCurrent)} saved + {formatCurrency(availableBalance)} available
+                </p>
+              )}
             </div>
-            <div className="bg-blue-900/40 p-4 rounded-lg border border-blue-800">
-              <p className="text-sm font-medium text-blue-300 mb-1">Remaining</p>
-              <p className="text-2xl font-semibold text-gray-100">{formatCurrency(totalTarget - totalCurrent)}</p>
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+              <p className="text-sm font-medium text-gray-300 mb-1">Total Remaining</p>
+              <p className="text-2xl font-bold text-white">
+                {formatCurrency(Math.max(0, totalTarget - (totalCurrent + availableBalance)))}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">Still needed overall</p>
             </div>
           </div>
           
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
+          <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+            <div className="flex justify-between items-center">
               <p className="text-sm font-medium text-gray-300">Overall Progress</p>
-              <p className="text-sm font-medium text-gray-300">{totalProgressPercent}%</p>
+              <p className="text-sm font-semibold text-white">{overallProgress}%</p>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
+            <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out" 
-                style={{ width: `${totalProgressPercent}%` }}
+                className={`h-4 rounded-full transition-all duration-1000 ease-out progress-bar ${
+                  overallProgress >= 75 ? 'bg-gradient-to-r from-green-400 to-emerald-500' :
+                  overallProgress >= 50 ? 'bg-gradient-to-r from-blue-400 to-indigo-500' :
+                  overallProgress >= 25 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                  'bg-gradient-to-r from-red-400 to-pink-500'
+                }`}
+                style={{ width: `${overallProgress}%` }}
               ></div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>$0</span>
+              <span>{formatCurrency(totalTarget)}</span>
             </div>
           </div>
         </div>
       )}
 
+      {/* Forms */}
       {showForm && (
-        <SavingGoalForm
-          goal={editingGoal}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-        />
+        <div className="scale-in">
+          <SavingGoalForm
+            goal={editingGoal}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
+        </div>
       )}
 
-      {showContributionForm && contributingGoal && (
-        <ContributionForm
-          goal={contributingGoal}
-          onSubmit={handleContribution}
-          onCancel={handleCancel}
+      {/* Goals List */}
+      <div className="slide-in">
+        <SavingGoalList
+          savingGoals={savingGoals}
+          onEdit={handleEditClick}
+          onDelete={deleteSavingGoal}
         />
-      )}
-
-      <SavingGoalList
-        savingGoals={savingGoals}
-        onEdit={handleEditClick}
-        onDelete={deleteSavingGoal}
-        onContribute={handleContributeClick}
-      />
+      </div>
     </div>
   );
 };

@@ -17,4 +17,5 @@ export interface SavingGoal {
 export interface FinanceData {
   expenses: Expense[];
   savingGoals: SavingGoal[];
+  budget: number;
 } 
