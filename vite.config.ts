@@ -5,8 +5,8 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Using relative path for GitHub Pages deployment
-  base: './',
+  // Using repository name for GitHub Pages deployment
+  base: '/FinanceTracker/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

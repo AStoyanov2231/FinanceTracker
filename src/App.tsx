@@ -59,13 +59,13 @@ function App() {
         <div className="relative">
           {/* Modern Navigation */}
           <div className="mb-6 sm:mb-8">
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-1.5 sm:p-2">
-              <nav className="flex flex-wrap sm:flex-nowrap justify-center sm:justify-start gap-1 sm:space-x-2">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-2 sm:p-3">
+              <nav className="flex flex-wrap sm:flex-nowrap justify-center sm:justify-start gap-3 sm:space-x-4">
                 {navItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => setActivePage(item.id)}
-                    className={`flex items-center justify-center sm:justify-start space-x-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all duration-300 font-medium min-w-0 flex-1 sm:flex-auto ${
+                    className={`flex items-center justify-center sm:justify-start space-x-3 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl transition-all duration-300 font-medium min-w-0 flex-1 sm:flex-auto ${
                       activePage === item.id
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
                         : 'text-gray-300 hover:text-white hover:bg-white/10 hover:scale-105'

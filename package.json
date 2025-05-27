@@ -5,6 +5,7 @@
   "type": "commonjs",
   "description": "A personal finance tracking application",
   "author": "Finance Tracker Team",
+  "homepage": "https://astovanov2231.github.io/FinanceTracker/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
