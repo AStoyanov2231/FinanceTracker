@@ -7,7 +7,6 @@ import { SavingGoal } from '../utils/types';
 const SavingGoalsPage: React.FC = () => {
   const { 
     savingGoals, 
-    budget, 
     isLoading, 
     addSavingGoal, 
     updateSavingGoal, 

@@ -28,7 +28,6 @@ const DashboardPage: React.FC = () => {
 
   // Calculate totals
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const currentSavings = savingGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
   const availableBalance = getAvailableBalance();
 
   // Handle budget addition
