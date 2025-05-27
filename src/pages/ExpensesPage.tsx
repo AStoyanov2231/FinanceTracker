@@ -91,7 +91,6 @@ const ExpensesPage: React.FC = () => {
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
             </div>
           </div>
-          <p className="text-xs text-green-400">Total allocated funds</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 hover:scale-105 transition-transform duration-300 card-hover">
@@ -106,7 +105,6 @@ const ExpensesPage: React.FC = () => {
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
-          <p className="text-xs text-red-400">Money spent</p>
         </div>
       </div>
 

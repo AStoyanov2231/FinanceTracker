@@ -103,7 +103,6 @@ const SavingGoalsPage: React.FC = () => {
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <p className="text-sm font-medium text-gray-300 mb-1">Target Amount</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(totalTarget)}</p>
-              <p className="text-xs text-gray-400 mt-1">Total goal amount</p>
             </div>
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <p className="text-sm font-medium text-gray-300 mb-1">Available Funds</p>
@@ -119,7 +118,6 @@ const SavingGoalsPage: React.FC = () => {
               <p className="text-2xl font-bold text-white">
                 {formatCurrency(Math.max(0, totalTarget - (totalCurrent + availableBalance)))}
               </p>
-              <p className="text-xs text-gray-400 mt-1">Still needed overall</p>
             </div>
           </div>
           

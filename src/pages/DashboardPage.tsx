@@ -134,7 +134,6 @@ const DashboardPage: React.FC = () => {
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
             </div>
           </div>
-          <p className="text-xs text-green-400">Available funds</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 hover:scale-105 transition-transform duration-300">
@@ -149,7 +148,6 @@ const DashboardPage: React.FC = () => {
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
-          <p className="text-xs text-red-400">Money spent</p>
         </div>
       </div>
 
@@ -276,11 +274,7 @@ const DashboardPage: React.FC = () => {
                 <p className="text-xs sm:text-sm text-gray-300 mb-1">
                   {formatCurrency(goal.totalAvailable)} of {formatCurrency(goal.targetAmount)}
                 </p>
-                {availableBalance > 0 && (
-                  <p className="text-xs text-emerald-400 mb-3 sm:mb-4">
-                    (Includes {formatCurrency(availableBalance)} available)
-                  </p>
-                )}
+                
                 <div className="w-full bg-white/10 rounded-full h-2 sm:h-3 overflow-hidden mb-2">
                   <div 
                     className={`h-full rounded-full transition-all duration-500 ${
