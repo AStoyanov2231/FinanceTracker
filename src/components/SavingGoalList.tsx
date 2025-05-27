@@ -9,7 +9,7 @@ interface SavingGoalListProps {
 }
 
 const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, onDelete }) => {
-  const { getAvailableBalance, addExpense, updateSavingGoal, deleteSavingGoal } = useFinance();
+  const { getAvailableBalance, addExpense, deleteSavingGoal } = useFinance();
   
   // Format currency
   const formatCurrency = (amount: number) => {
