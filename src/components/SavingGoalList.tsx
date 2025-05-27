@@ -9,7 +9,7 @@ interface SavingGoalListProps {
 }
 
 const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, onDelete }) => {
-  const { getAvailableBalance, addExpense, updateSavingGoal } = useFinance();
+  const { getAvailableBalance, addExpense, updateSavingGoal, deleteSavingGoal } = useFinance();
   
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -50,11 +50,8 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
         date: new Date().toISOString().split('T')[0]
       });
       
-      // Update the goal to show it's been purchased (reset the current amount)
-      await updateSavingGoal({
-        ...goal,
-        currentAmount: 0
-      });
+      // Delete the goal after purchase
+      await deleteSavingGoal(goal.id);
     } catch (error) {
       console.error('Failed to complete goal purchase:', error);
     }
