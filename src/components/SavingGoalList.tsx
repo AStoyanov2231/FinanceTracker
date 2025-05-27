@@ -45,7 +45,7 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
       // Create an expense with the goal's name and amount
       await addExpense({
         name: `Purchase: ${goal.name}`,
-        amount: goal.currentAmount,
+        amount: goal.targetAmount,
         category: 'Goal Purchase',
         date: new Date().toISOString().split('T')[0]
       });
@@ -92,8 +92,8 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
             const remaining = Math.max(0, goal.targetAmount - totalAvailable);
             // Calculate progress with the full available balance
             const progressPercent = calculateProgress(totalAvailable, goal.targetAmount);
-            // Check if goal is fully funded
-            const isFullyFunded = goal.currentAmount >= goal.targetAmount;
+            // Check if goal is fully funded (using the total available amount)
+            const isFullyFunded = totalAvailable >= goal.targetAmount;
             
             const gradientColor = 
               progressPercent >= 75 ? 'from-green-500 to-emerald-400' :
