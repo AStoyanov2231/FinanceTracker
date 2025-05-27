@@ -9,7 +9,7 @@ interface SavingGoalListProps {
 }
 
 const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, onDelete }) => {
-  const { getAvailableBalance } = useFinance();
+  const { getAvailableBalance, addExpense, updateSavingGoal } = useFinance();
   
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -38,6 +38,27 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
   
   // Get the available balance to be shared across all goals
   const availableBalance = getAvailableBalance();
+
+  // Handle buying/completing a goal
+  const handleBuyGoal = async (goal: SavingGoal) => {
+    try {
+      // Create an expense with the goal's name and amount
+      await addExpense({
+        name: `Purchase: ${goal.name}`,
+        amount: goal.currentAmount,
+        category: 'Goal Purchase',
+        date: new Date().toISOString().split('T')[0]
+      });
+      
+      // Update the goal to show it's been purchased (reset the current amount)
+      await updateSavingGoal({
+        ...goal,
+        currentAmount: 0
+      });
+    } catch (error) {
+      console.error('Failed to complete goal purchase:', error);
+    }
+  };
 
   // Sort goals by progress (least progress first)
   const sortedGoals = [...savingGoals].sort((a, b) => {
@@ -71,6 +92,8 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
             const remaining = Math.max(0, goal.targetAmount - totalAvailable);
             // Calculate progress with the full available balance
             const progressPercent = calculateProgress(totalAvailable, goal.targetAmount);
+            // Check if goal is fully funded
+            const isFullyFunded = goal.currentAmount >= goal.targetAmount;
             
             const gradientColor = 
               progressPercent >= 75 ? 'from-green-500 to-emerald-400' :
@@ -83,6 +106,17 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors">{goal.name}</h3>
                   <div className="flex space-x-2">
+                    {isFullyFunded && (
+                      <button
+                        onClick={() => handleBuyGoal(goal)}
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-500/30 text-emerald-300 hover:bg-emerald-500/50 transition-colors duration-150 border border-emerald-500/40"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Buy
+                      </button>
+                    )}
                     <button
                       onClick={() => onEdit(goal)}
                       className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/40 transition-colors duration-150 border border-indigo-500/30"
@@ -139,6 +173,11 @@ const SavingGoalList: React.FC<SavingGoalListProps> = ({ savingGoals, onEdit, on
                         {progressPercent}%
                       </span>
                     </div>
+                    {isFullyFunded && (
+                      <span className="text-sm font-medium text-emerald-400">
+                        Ready to purchase!
+                      </span>
+                    )}
                   </div>
                   <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden backdrop-blur-sm shadow-inner">
                     <div 
