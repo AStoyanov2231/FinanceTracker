@@ -72,11 +72,19 @@ const SavingGoalForm: React.FC<SavingGoalFormProps> = ({ goal, onSubmit, onCance
   };
 
   const handleDateSelection = (newDate: Date) => {
-    setTempDate(newDate);
+    // Create a new date to avoid reference issues
+    const selectedDate = new Date(newDate);
+    // Set the hours to 12 to avoid any timezone issues
+    selectedDate.setHours(12, 0, 0, 0);
+    setTempDate(selectedDate);
   };
 
   const confirmDateSelection = () => {
-    setDeadline(tempDate.toISOString().split('T')[0]);
+    // Create a new date with the time zone offset to ensure correct date selection
+    const correctedDate = new Date(tempDate);
+    // Set the hours to 12 to avoid any timezone issues
+    correctedDate.setHours(12, 0, 0, 0);
+    setDeadline(correctedDate.toISOString().split('T')[0]);
     setIsCalendarOpen(false);
   };
 
@@ -165,7 +173,7 @@ const SavingGoalForm: React.FC<SavingGoalFormProps> = ({ goal, onSubmit, onCance
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <span className="text-gray-400">$</span>
+              <span className="text-gray-400">лв</span>
             </div>
             <input
               type="number"

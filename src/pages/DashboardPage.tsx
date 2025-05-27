@@ -20,9 +20,9 @@ const DashboardPage: React.FC = () => {
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('bg-BG', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'BGN'
     }).format(amount);
   };
 
@@ -92,7 +92,7 @@ const DashboardPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-white">Add to Budget</h2>
+            <h2 className="text-lg font-semibold text-white">Добави към бюджет</h2>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3">
@@ -100,7 +100,7 @@ const DashboardPage: React.FC = () => {
               type="number"
               value={budgetInput}
               onChange={(e) => setBudgetInput(e.target.value)}
-              placeholder="Enter amount..."
+              placeholder="Въведете сума..."
               className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
@@ -113,7 +113,7 @@ const DashboardPage: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               ) : (
-                'Add'
+                'OK'
               )}
             </button>
           </div>
@@ -130,7 +130,7 @@ const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-300">Total Budget</p>
+              <p className="text-sm font-medium text-gray-300">Бюджет</p>
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
             </div>
           </div>
@@ -144,7 +144,7 @@ const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-300">Total Expenses</p>
+              <p className="text-sm font-medium text-gray-300">Всички разходи</p>
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
@@ -161,7 +161,7 @@ const DashboardPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-white">Recent Expenses</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Последни разходи</h2>
           </div>
           
           {recentExpenses.length === 0 ? (
@@ -171,8 +171,8 @@ const DashboardPage: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <p className="text-gray-300 text-base sm:text-lg">No expenses yet</p>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">Start tracking your spending</p>
+              <p className="text-gray-300 text-base sm:text-lg">Няма разходи</p>
+              <p className="text-gray-500 text-xs sm:text-sm mt-1">Започни да следиш разходите си</p>
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">
@@ -197,7 +197,7 @@ const DashboardPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-white">Top Categories</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Най-често разходи по категории</h2>
           </div>
           
           {topCategories.length === 0 ? (
@@ -207,8 +207,8 @@ const DashboardPage: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <p className="text-gray-300 text-base sm:text-lg">No categories yet</p>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">Add expenses to see spending patterns</p>
+              <p className="text-gray-300 text-base sm:text-lg">Няма категории</p>
+              <p className="text-gray-500 text-xs sm:text-sm mt-1">Добави разходи, за да видиш разходите</p>
             </div>
           ) : (
             <div className="space-y-4 sm:space-y-6">
@@ -253,7 +253,7 @@ const DashboardPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-white">Saving Goals Progress</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white">Цели за спестяване</h2>
         </div>
         
         {priorityGoals.length === 0 ? (
@@ -263,8 +263,8 @@ const DashboardPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-gray-300 text-base sm:text-lg">No saving goals yet</p>
-            <p className="text-gray-500 text-xs sm:text-sm mt-1">Create goals to start saving automatically</p>
+            <p className="text-gray-300 text-base sm:text-lg">Няма цели за спестяване</p>
+            <p className="text-gray-500 text-xs sm:text-sm mt-1">Създай цели, за да започнеш да спестяваш автоматично</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -287,7 +287,7 @@ const DashboardPage: React.FC = () => {
                   ></div>
                 </div>
                 <div className="flex justify-center">
-                  <p className="text-xs text-gray-400">{Math.round(goal.progress)}% complete</p>
+                  <p className="text-xs text-gray-400">{Math.round(goal.progress)}% завършено</p>
                 </div>
               </div>
             ))}

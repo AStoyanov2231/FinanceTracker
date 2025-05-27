@@ -26,16 +26,16 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onEdit, onDelete })
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('bg-BG', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'BGN'
     }).format(amount);
   };
 
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('bg-BG', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -65,7 +65,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onEdit, onDelete })
     <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
       <div className="p-4 sm:p-6 border-b border-white/10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-white">Expense History</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white">История на разходите</h2>
           
           {categories.length > 1 && (
             <div className="flex items-center space-x-2">

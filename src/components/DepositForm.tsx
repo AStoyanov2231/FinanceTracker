@@ -27,9 +27,9 @@ const DepositForm: React.FC<DepositFormProps> = ({ onSubmit, onCancel, currentBu
   
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('bg-BG', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'BGN'
     }).format(amount);
   };
 
@@ -60,7 +60,7 @@ const DepositForm: React.FC<DepositFormProps> = ({ onSubmit, onCancel, currentBu
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 sm:text-sm">$</span>
+              <span className="text-gray-400 sm:text-sm">лв</span>
             </div>
             <input
               type="number"

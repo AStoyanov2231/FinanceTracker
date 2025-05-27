@@ -36,9 +36,9 @@ const ExpensesPage: React.FC = () => {
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('bg-BG', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'BGN'
     }).format(amount);
   };
 
@@ -87,7 +87,7 @@ const ExpensesPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-300">Available Budget</p>
+              <p className="text-sm font-medium text-gray-300">Бюджет</p>
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
             </div>
           </div>
@@ -101,7 +101,7 @@ const ExpensesPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-300">Total Expenses</p>
+              <p className="text-sm font-medium text-gray-300">Всички разходи</p>
               <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
