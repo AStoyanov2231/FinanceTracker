@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useFinance } from '../contexts/FinanceContext';
 
 const DashboardPage: React.FC = () => {
-  const { expenses, savingGoals, budget, isLoading, addToBudget, getAvailableBalance } = useFinance();
+  const { expenses, savingGoals, budget, isLoading, addToBudget, updateBudget, getAvailableBalance } = useFinance();
   const [budgetInput, setBudgetInput] = useState<string>('');
   const [isAddingBudget, setIsAddingBudget] = useState(false);
+  const [isEditingBudget, setIsEditingBudget] = useState(false);
+  const [editBudgetInput, setEditBudgetInput] = useState<string>('');
 
   if (isLoading) {
     return (
@@ -44,6 +46,30 @@ const DashboardPage: React.FC = () => {
         setIsAddingBudget(false);
       }
     }
+  };
+
+  // Handle budget update
+  const handleUpdateBudget = async () => {
+    const amount = parseFloat(editBudgetInput);
+    if (amount && amount > 0) {
+      try {
+        await updateBudget(amount);
+        setIsEditingBudget(false);
+      } catch (error) {
+        console.error('Error updating budget:', error);
+      }
+    }
+  };
+
+  // Start editing budget with current value
+  const startEditingBudget = () => {
+    setEditBudgetInput(budget.toString());
+    setIsEditingBudget(true);
+  };
+
+  // Cancel editing budget
+  const cancelEditBudget = () => {
+    setIsEditingBudget(false);
   };
 
   // Get recent expenses (last 5)
@@ -123,16 +149,57 @@ const DashboardPage: React.FC = () => {
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 hover:scale-105 transition-transform duration-300">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 sm:p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 sm:p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-300">Бюджет</p>
+                {isEditingBudget ? (
+                  <div className="flex items-center space-x-2 mt-1">
+                    <input
+                      type="number"
+                      value={editBudgetInput}
+                      onChange={(e) => setEditBudgetInput(e.target.value)}
+                      className="w-24 sm:w-32 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                      onClick={handleUpdateBudget}
+                      disabled={!editBudgetInput || parseFloat(editBudgetInput) <= 0}
+                      className="p-1 bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={cancelEditBudget}
+                      className="p-1 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-300">Бюджет</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(budget)}</p>
-            </div>
+            {!isEditingBudget && (
+              <button
+                onClick={startEditingBudget}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                title="Редактирай бюджет"
+              >
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 

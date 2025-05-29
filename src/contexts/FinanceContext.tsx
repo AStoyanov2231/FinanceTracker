@@ -15,6 +15,7 @@ interface FinanceContextType {
   updateSavingGoal: (goal: SavingGoal) => Promise<void>;
   deleteSavingGoal: (id: string) => Promise<void>;
   addToBudget: (amount: number) => Promise<void>;
+  updateBudget: (amount: number) => Promise<void>;
   getAvailableBalance: () => number;
 }
 
@@ -190,6 +191,16 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     }));
   };
 
+  // Update budget
+  const updateBudget = async (amount: number) => {
+    await storage.updateBudget(amount);
+    
+    setFinanceData(prev => ({
+      ...prev,
+      budget: amount
+    }));
+  };
+
   const value = {
     expenses: financeData.expenses,
     savingGoals: financeData.savingGoals,
@@ -202,6 +213,7 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     updateSavingGoal,
     deleteSavingGoal,
     addToBudget,
+    updateBudget,
     getAvailableBalance
   };
 
